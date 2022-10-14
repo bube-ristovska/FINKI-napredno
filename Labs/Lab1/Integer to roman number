@@ -1,0 +1,19 @@
+public class RomanConverter {
+    private int num;
+
+    public String integerToRoman(int num){
+        String [] edinici = {"","I","II", "III", "IV", "V", "VI", "VII", "VIII", "IX"};
+        String [] desetki = {"", "X", "XX", "XXX", "XL", "L", "LX", "LXX", "LXXX", "XC"};
+        String [] stotki = {"", "C", "CC", "CCC", "CD", "D", "DC", "DCC", "DCCC", "CM"};
+        String [] iljadi ={"", "M", "MM", "MMM", "MMMM"};
+        String out = iljadi[num/1000] + stotki[(num%1000)/100] + desetki[(num%100)/10] + edinici[num%10];
+        return out;
+    }
+
+
+
+    public static void main(String[] args) {
+        RomanConverter rm = new RomanConverter();
+        System.out.println(rm.integerToRoman(30));
+    }
+}
