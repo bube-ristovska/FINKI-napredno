@@ -1,0 +1,40 @@
+import java.math.BigDecimal;
+
+public class BigComplex {
+
+    private BigDecimal realPart;
+    private BigDecimal imaginaryPart;
+
+    public BigComplex() {
+    }
+
+    public BigComplex(BigDecimal realPart, BigDecimal imaginaryPart) {
+        this.realPart = realPart;
+        this.imaginaryPart = imaginaryPart;
+    }
+
+    @Override
+    public String toString() {
+        return "BigComplex{" +
+                "realPart=" + realPart +
+                ", imaginaryPart=" + imaginaryPart +
+                '}';
+    }
+
+    public BigComplex add(BigComplex complex2){
+        return new BigComplex(this.realPart.add(complex2.realPart), this.imaginaryPart.add(complex2.imaginaryPart));
+    }
+    public BigComplex sub(BigComplex complex2){
+        return new BigComplex(this.realPart.subtract(complex2.realPart), this.imaginaryPart.subtract(complex2.imaginaryPart));
+    }
+    public BigComplex div(BigComplex complex2){
+        return new BigComplex(this.realPart.divide(complex2.realPart), this.imaginaryPart.divide(complex2.imaginaryPart));
+    }
+    public BigComplex mul(BigComplex complex2){
+        return new BigComplex(this.realPart.multiply(complex2.realPart), this.imaginaryPart.multiply(complex2.imaginaryPart));
+    }
+
+    public static void main(String[] args) {
+        
+    }
+}
