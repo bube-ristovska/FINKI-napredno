@@ -1,0 +1,22 @@
+public class Refactoring {
+    public static boolean isDivisibleWithDigitSum(int start, int end){
+        for(int i = start; i < end; i ++){
+            int num = i;
+            int sum = 0;
+            while(num > 0){
+                sum+= num % 10;
+                num = num/10;
+            }
+
+            if( i % sum ==0){
+                System.out.println(i);
+            }
+        }
+        return true;
+    }
+
+    public static void main(String[] args) {
+
+        System.out.println(isDivisibleWithDigitSum(20,30));
+    }
+}
