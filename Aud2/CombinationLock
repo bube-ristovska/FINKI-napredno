@@ -1,0 +1,51 @@
+package Aud2;
+
+public class CombinationLock {
+    private int combination;
+    public boolean isOpen;
+    private static int DEFAULT_COMBINATION = 100, MIN_COMBINATION = 100, MAX_COMBINATION =999;
+
+    public CombinationLock(int combination) {
+        if(isValid(combination)){
+            this.combination = combination;
+        }
+        else this.combination = DEFAULT_COMBINATION;
+        this.isOpen = false;
+    }
+
+    private boolean isValid(int combination){
+        return (combination >= MIN_COMBINATION && combination <=MAX_COMBINATION);
+    }
+    public boolean open(int combo){
+        if(isOpen) return false;
+        this.isOpen = (this.combination == combo);
+        return this.isOpen;
+    }
+
+    public boolean changeCombination(int oldCOmbination, int newCombination){
+        if(open(oldCOmbination) && isValid(newCombination)){
+            this.combination = newCombination;
+            this.lock();
+            return true;
+        }
+        return false;
+    }
+
+    public void lock(){
+        this.isOpen = false;
+    }
+
+    public static void main(String[] args) {
+        CombinationLock valid = new CombinationLock(235);
+
+        System.out.println("TESTING open()");
+        System.out.println(valid.open(235));
+        System.out.println("TESTING lock()");
+        valid.lock();
+        System.out.println(valid.isOpen);
+        System.out.println("TESTING changeCombination()");
+        valid.changeCombination(235, 777);
+        System.out.println(valid.combination);
+
+    }
+}
