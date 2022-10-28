@@ -1,0 +1,159 @@
+package Kalkulator;
+
+public class Addition implements Strategy{
+    @Override
+    public double calculate(double num1, double num2) {
+        return num1+num2;
+    }
+}
+
+package Kalkulator;
+
+public class Calculator {
+
+    private double result;
+    private Strategy strategy;
+
+
+    public Calculator(double result) {
+        this.result = 0;
+    }
+
+    public Calculator() {
+
+    }
+
+    public String execute(char operation, double value) throws UnknownOperatorException {
+        if(operation == '+'){
+            strategy = new Addition();
+        }
+        else if(operation == '-'){
+            strategy = new Subtraction();
+        }
+        else if(operation == '/'){
+            strategy = new Division();
+        }
+        else if(operation == '*'){
+            strategy = new Multipllication();
+        }
+        else throw new UnknownOperatorException(operation);
+        result = strategy.calculate(result,value);//bitno! So ova se pravi dizajn pattern
+        return String.format("result %c %.2f = %.2f", operation, value, result);
+    }
+
+    public double getResult() {
+        return result;
+    }
+    public String init(){
+       return String.format("  result = %.2f", result);
+    }
+    @Override
+    public String toString() {
+        return String.format("updated result = %.2f", result);
+    }
+}
+
+package Kalkulator;
+
+import java.util.Scanner;
+
+public class CalculatorTest implements Strategy{
+
+    public static char getCharLower(String line){
+        if(line.trim().length() > 0 ){ //da ne e prazen string bez praznite mesta so trim()
+            return Character.toLowerCase(line.charAt(0));
+        }
+        else return '?';//ako ne vnel definirano neshto
+    }
+
+
+
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+
+        Calculator calculator = new Calculator();
+        System.out.println(calculator.init());
+
+        while (true) {
+            String line = scanner.nextLine();
+            char choice = getCharLower(line);
+            if (choice == 'r') {
+                System.out.println(String.format("final reuslt = %f", calculator.getResult()));
+                break;
+            }
+
+            String[] parts = line.split("\\s+"); //edno ili povekje prazni mesta i pritoa dobivame niza od stringovi
+            char operator = parts[0].charAt(0); //da ne kastirame od stringot zemi go prviot karakteer
+            double value = Double.parseDouble(parts[1]);  //brojot deka e posle praznoto mesto
+
+            try {
+                String result = calculator.execute(operator, value);
+                System.out.println(result);
+                System.out.println(calculator);
+                /** TRY CATCH BLOKOT TREBA DA SE NAOGJA NA MESTOTO KADE SHTO SE POVIKUVA FUNKCIJATA PRI KOJA IZVEDUVAME ISKLUCHOK*/
+            } catch (UnknownOperatorException e) {
+                System.out.println(e.getMessage()); //sekogash porakata
+            }
+        }
+
+        System.out.println("(Y/N)");
+        String line = scanner.nextLine();
+        char choice = getCharLower(line);
+
+        }
+
+    @Override
+    public double calculate(double num1, double num2) {
+        return 0;
+    }
+}
+
+
+}
+
+
+package Kalkulator;
+
+public class Division implements Strategy{
+    @Override
+    public double calculate(double num1, double num2) {
+        if(num2 != 0)
+            return num1/num2;
+        return num1; //tuka treba exception so zero
+    }
+}
+
+package Kalkulator;
+
+public class Multipllication implements Strategy{
+
+    @Override
+    public double calculate(double num1, double num2) {
+        return num1*num2;
+    }
+}
+
+package Kalkulator;
+
+public interface Strategy {
+    /**najbitnoooooooooooo*/
+    double calculate(double num1, double num2);
+}
+
+package Kalkulator;
+
+public class Subtraction implements Strategy{
+
+    @Override
+    public double calculate(double num1, double num2) {
+        return num1-num2;
+    }
+}
+
+package Kalkulator;
+
+public class UnknownOperatorException extends Exception{
+    public UnknownOperatorException(char operator) {
+        super(String.format("This operator %c is not valid",operator));
+    }
+}
