@@ -1,0 +1,208 @@
+package Aud4;
+
+public class Account {
+    String name;
+    long id;
+    double balance;
+    static long ID_COUNTER = 1000;
+
+    public Account(String name, double balance) {
+        this.name = name;
+        this.balance = balance;
+        id = ID_COUNTER++; //kje zeme 1000 pa kje se zgolemi na 1001
+    }
+
+    public Account(String name) {
+        this.name = name;
+        this.balance = 0;
+        id = ID_COUNTER++;
+    }
+
+    public double getBalance() {
+        return balance;
+    }
+    public void deposit(double amount){
+        balance += amount;
+    }
+    public  void withdraw(double amount) throws InsufficientAmountException { //avtomatski se generira
+        if(amount <= balance){
+            balance -= amount;
+        }
+        else{
+            throw new InsufficientAmountException(amount); //exception
+        }
+    }
+
+    boolean canHaveInterest(){
+        return true;
+    }
+
+}
+
+package Aud4;
+
+import java.util.Arrays;
+
+public class Bank {
+    String name;
+    Account[] accounts;
+    int capacity; //vk kapacitet
+    int n; //br na acc
+
+    public Bank(String name) {
+        this.name = name;
+        capacity = 10;
+        int n  = 0;
+        accounts = new Account[capacity];
+    }
+
+    public void addAccount(Account account){
+        if(n == capacity){
+            accounts = Arrays.copyOf(accounts, 2*capacity); //da se zgolemi kapacitetot
+            capacity*=2;
+        }
+        accounts[n] = account;
+        n++;
+    }
+
+    public double totalAssets(){
+        double sum = 0;
+        for (int i = 0; i < n; i++) {
+            sum+=accounts[i].getBalance();
+
+        }
+        return sum;
+    }
+
+    public void addInterest(){
+        for (int i = 0; i < n; i++) {
+            if(accounts[i].canHaveInterest()){
+                InterestBearingAccount iba = (InterestBearingAccount) accounts[i]; // go kastirame vo objekt
+                iba.addInterest();
+            }
+        }
+    }
+
+    @Override
+    public String toString() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(String.format("Bank name: %s\n", this.name));
+        for (int i = 0; i < n; i++) {
+            sb.append(accounts[i]);
+        }
+        return "WORKS string builder";
+    }
+}
+
+package Aud4;
+
+public class BankTester {
+    public static void main(String[] args) throws InsufficientAmountException {
+        Bank bank = new Bank("Finki");
+        System.out.println(bank);
+        Account a1 = new InterestCheckingAccount("Stefan", 1000);
+        Account a2 = new PlatinumCheckingAccount("Bube", 1000020);
+        System.out.println(bank);
+
+        bank.addInterest();
+
+        for (int i = 0; i < bank.n; i++) {
+            bank.accounts[i].withdraw(110000); //vaka we handle exceptions
+            try{
+                bank.accounts[i].withdraw(110000);
+            }
+            catch (InsufficientAmountException e){
+                System.out.println(e.getMessage());
+            }
+        }
+
+
+
+
+
+    }
+
+}
+
+package Aud4;
+
+public class InsufficientAmountException extends Exception{
+    InsufficientAmountException(double amount){
+        super(String.format("You don't have %d$ on your account",amount));
+    }
+}
+
+package Aud4;
+
+public interface InterestBearingAccount {
+    void addInterest(); //dodavanje na provizija na kamata
+}
+
+package Aud4;
+
+public class InterestCheckingAccount extends Account implements InterestBearingAccount{
+    static double INTEREST_RATE = 0.03; //3%
+
+    boolean canHaveInterest(){
+        return true;
+    }
+    public InterestCheckingAccount(String name, double balance) {
+        super(name, balance);
+    }
+
+    public InterestCheckingAccount(String name) {
+        super(name);
+    }
+
+    @Override
+    public void addInterest() {
+        this.balance+=(this.balance*INTEREST_RATE);
+    }
+
+    @Override
+    public String toString() {
+        return "InterestCheckingAccount{" +
+                "name='" + name + '\'' +
+                ", id=" + id +
+                ", balance=" + balance +
+                '}';
+    }
+}
+
+package Aud4;
+
+public class NonInterestCheckingAccount extends Account{
+    public NonInterestCheckingAccount(String name, double balance) {
+        super(name, balance);
+    }
+
+    public NonInterestCheckingAccount(String name) {
+        super(name);
+    }
+
+    @Override
+    public String toString() {
+        return "NonInterestCheckingAccount{" +
+                "name='" + name + '\'' +
+                ", id=" + id +
+                ", balance=" + balance +
+                '}';
+    }
+}
+
+package Aud4;
+
+public class PlatinumCheckingAccount extends InterestCheckingAccount{
+    public PlatinumCheckingAccount(String name, double balance) {
+        super(name, balance);
+    }
+
+    public PlatinumCheckingAccount(String name) {
+        super(name);
+    }
+
+    @Override
+    public void addInterest() {
+        this.balance *=(1+INTEREST_RATE*2);
+    }
+}
