@@ -13,38 +13,38 @@ public class IntegerArrayTester {
         String s = scanner.nextLine();
         IntegerArray ia = null;
         switch (s) {
-        case "testSimpleMethods":
-            ia = new IntegerArray(generateRandomArray(scanner.nextInt()));
-            testSimpleMethods(ia);
-            break;
-        case "testConcat":
-            testConcat(scanner);
-            break;
-        case "testEquals":
-            testEquals(scanner);
-            break;
-        case "testSorting":
-            testSorting(scanner);
-            break;
-        case "testReading":
-            testReading(new ByteArrayInputStream(scanner.nextLine().getBytes()));
-            break;
-        case "testImmutability":
-            int a[] = generateRandomArray(scanner.nextInt());
-            ia = new IntegerArray(a);
-            testSimpleMethods(ia);
-            testSimpleMethods(ia);
-            IntegerArray sorted_ia = ia.getSorted();
-            testSimpleMethods(ia);
-            testSimpleMethods(sorted_ia);
-            sorted_ia.getSorted();
-            testSimpleMethods(sorted_ia);
-            testSimpleMethods(ia);
-            a[0] += 2;
-            testSimpleMethods(ia);
-            ia = ArrayReader.readIntegerArray(new ByteArrayInputStream(integerArrayToString(ia).getBytes()));
-            testSimpleMethods(ia);
-            break;
+            case "testSimpleMethods":
+                ia = new IntegerArray(generateRandomArray(scanner.nextInt()));
+                testSimpleMethods(ia);
+                break;
+            case "testConcat":
+                testConcat(scanner);
+                break;
+            case "testEquals":
+                testEquals(scanner);
+                break;
+            case "testSorting":
+                testSorting(scanner);
+                break;
+            case "testReading":
+                testReading(new ByteArrayInputStream(scanner.nextLine().getBytes()));
+                break;
+            case "testImmutability":
+                int a[] = generateRandomArray(scanner.nextInt());
+                ia = new IntegerArray(a);
+                testSimpleMethods(ia);
+                testSimpleMethods(ia);
+                IntegerArray sorted_ia = ia.getSorted();
+                testSimpleMethods(ia);
+                testSimpleMethods(sorted_ia);
+                sorted_ia.getSorted();
+                testSimpleMethods(sorted_ia);
+                testSimpleMethods(ia);
+                a[0] += 2;
+                testSimpleMethods(ia);
+                ia = ArrayReader.readIntegerArray(new ByteArrayInputStream(integerArrayToString(ia).getBytes()));
+                testSimpleMethods(ia);
+                break;
         }
         scanner.close();
     }
@@ -120,35 +120,35 @@ public class IntegerArrayTester {
 
 }
 
-final public class IntegerArray {
+final class IntegerArray {
     private int [] niza;
     private int n;
-    public IntegerArray(int a[]) {
-        this.niza = a;
-        n = a.length;
+    public IntegerArray(int a[]){
+       this.n = a.length;
+       this.niza = Arrays.copyOf(a, a.length);
     }
-    public int length() {
+    public int length(){
         return this.n;
     }
-    public int getElementAt(int i) {
+    public int getElementAt(int i){
         return this.niza[i];
     }
-    public int sum() {
+    public int sum(){
         int s=0;
         for (int i = 0; i < this.n; i++) {
             s+=niza[i];
         }
         return s;
     }
-    public double average() {
+    public double average(){
         return (double)sum()/this.n;
     }
-    public IntegerArray getSorted() {
+    public IntegerArray getSorted(){
         IntegerArray temp = new IntegerArray(niza);
         int tempNum;
         for (int i = 0; i < length()-1; i++) {
             for (int j = 0; j < length()-i-1; j++) {
-                if(temp.niza[j] > temp.niza[j+1]) {
+                if(temp.niza[j] > temp.niza[j+1]){
                     tempNum = temp.niza[j];
                     temp.niza[j] = temp.niza[j+1];
                     temp.niza[j+1] = tempNum;
@@ -158,12 +158,15 @@ final public class IntegerArray {
         return temp;
     }
 
-    public IntegerArray concat(IntegerArray ia) {
-        IntegerArray newArray = new IntegerArray(niza);
-        for (int i = this.niza.length; i < ia.niza.length; i++) {
-            newArray.niza[i] = ia.niza[i-ia.length()];
+    public IntegerArray concat(IntegerArray ia){
+        int [] newArr = new int[n+ia.n];
+        for (int i = 0; i < niza.length; i++) {
+            newArr[i] = getElementAt(i);
         }
-        return newArray;
+        for (int i = n; i < n+ia.n; i++) {
+            newArr[i] = ia.getElementAt(i-ia.n);
+        }
+        return new IntegerArray(newArr);
     }
 
     @Override
@@ -175,10 +178,18 @@ final public class IntegerArray {
         }
         return arrString+this.niza[n-1]+"]";
     }
+    
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        IntegerArray that = (IntegerArray) o;
+        return n == that.n && Arrays.equals(niza, that.niza);
+    }
 }
 
-public class ArrayReader {
-    public static IntegerArray readIntegerArray(InputStream input) {
+class ArrayReader {
+    public static IntegerArray readIntegerArray(InputStream input){
         Scanner sc = new Scanner(input);
         int length = sc.nextInt();
         int[] arr = new int[length];
