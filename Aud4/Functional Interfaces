@@ -1,0 +1,63 @@
+package Aud4;
+
+import java.util.Random;
+import java.util.function.*;
+
+public class FunctionalInterfacesTest {
+    public static void main(String[] args) {
+        //foreach(), filter(), map() site primaat nekakov lambda expression koj e implementacija na funkciski interfejs
+        Predicate<Integer> lessThan100 = new Predicate<Integer>() {
+            @Override
+            public boolean test(Integer integer) { //sekogash vrakja boolean
+                return integer < 100;
+            }
+        };
+
+        Predicate<Integer> lessthan100 = integer -> integer < 100; //ova e isto od kodot pogore
+
+        Supplier<Integer> IntegerSupplier = new Supplier<Integer>() {
+            @Override
+            public Integer get() {
+                return new Random().nextInt(1000);
+            }
+        };
+
+        Supplier<Integer> integerSupplier = () -> new Random().nextInt(1000); //isto so toa pogore
+
+        Consumer<String> IntegerConsumer = new Consumer<String>() {
+            @Override
+            public void accept(String s) {
+                System.out.println(s);
+            }
+        };
+
+        Consumer<String> stringConsumer = s -> System.out.println("hello"); //isto kako toa pogore
+
+        Function<Integer, String> PrintNumber = new Function<Integer, String>() {//zemame integer vrakjame string
+            @Override
+            public String apply(Integer integer) {
+                return String.format("%d\n", integer);
+            }
+        };
+
+        Function<Integer, String> formatedNumberString = num -> String.format("%d\n", num); //isto ko pogore zemi go num i printaj kako string
+
+
+        BiFunction<Integer, Integer, String> SumNumbersAndFormat = new BiFunction<Integer, Integer, String>() {
+            @Override
+            public String apply(Integer integer, Integer integer2) { //
+                return  String.format("%d+%d = %d", integer,integer2, integer+integer2);
+            }
+        };
+
+        BiFunction<Integer, Integer, String> sumNumbersAndFormat = (i, i2) ->
+                String.format("%d+%d = %d", i, i2, i+i2);
+
+
+        //predikat kazhuva true/false
+        //suplier ne prima nishto ama vrakja rezultat
+        //function prima eden argument vrakaj eden argument
+        //bifunction prima dva argumenti i mozhe da vrati tret argument
+
+    }
+}
