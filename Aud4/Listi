@@ -1,0 +1,46 @@
+package Aud4;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class ArrayListTest {
+    public static void main(String[] args) {
+        List<Integer> integerList = new ArrayList<>();
+        List<String> stringList = new ArrayList<>();
+
+        integerList.add(8);
+        integerList.add(3);
+        integerList.add(4);
+        integerList.add(5);
+        integerList.add(6);
+        integerList.add(5);
+
+        stringList.add("B");
+
+        System.out.println(integerList);
+        System.out.println(stringList);
+
+
+        System.out.println(integerList.size());
+        System.out.println(integerList.get(4));
+
+
+        System.out.println(integerList.contains(5));
+        System.out.println(integerList.contains(102));
+
+        System.out.println(integerList.indexOf(5)); //prvoto pojavuvanje
+        System.out.println(integerList.lastIndexOf(5)); //vtoroto pojavuvanje na 5kata
+
+
+        System.out.println(integerList.removeIf(i -> i > 5)); //lambda expression/predikat
+        /** predikat e funkciski interfejs koj e implementiran shto vrakja boolean i -> i > 5 znachi
+         * zemi go i i proveri dali e > od 5 ako e > od 5 togash izbrishi go i vo listata*/
+        System.out.println(integerList);
+
+//        integerList.stream().map()...chain od akcii, ako nema TERMINALNA akcija(foreach,collect...) nishto nema da se izvrshi!
+
+
+
+
+    }
+}
