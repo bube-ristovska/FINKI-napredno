@@ -1,0 +1,125 @@
+
+//package KolokviumskaNP;
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.PrintStream;
+import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Scanner;
+import java.util.ArrayList;
+import java.util.List;
+
+ class Items {
+    int item_price;
+    double item_tax_type;
+
+    public Items(int item_price, String tax) {
+        if(tax.equals("A")) item_tax_type = 0.18;
+        else if(tax.equals("B")) item_tax_type = 0.05;
+        else item_tax_type = 0;
+
+        this.item_price = item_price; //valjda int
+    }
+}
+
+class MojDDV {
+    List<Fiskalna> fiskalnas;
+    public void readRecords(InputStream in) throws AmountNotAllowedException {
+        Scanner scanner = new Scanner(in);
+        fiskalnas = new ArrayList<>();
+        while (scanner.hasNextLine()) {
+            String pom = scanner.nextLine();
+            Fiskalna fiskalna = null;
+            try {
+                fiskalna = new Fiskalna(pom);
+            } catch (AmountNotAllowedException e) {
+                e.getMessage();
+            }
+            if(fiskalna != null) fiskalnas.add(fiskalna);
+        }
+        scanner.close();
+    }
+
+    public void printTaxReturns(PrintStream out) { //site fiskalni so full sumataa i
+        PrintWriter printWriter = new PrintWriter(out);
+        for (Fiskalna fiskalna : fiskalnas) {
+            int fp = fiskalna.getFull_price();
+            double ftx = fiskalna.full_tax();
+            printWriter.println(String.format("%s %d %.2f", fiskalna.id, fp, ftx));
+        }
+        printWriter.flush();
+    }
+
+
+    //povratokot iznesuva 15% od DDV na artiklot
+}
+
+ class Fiskalna {
+    String id;
+    List<Items> itemsList;
+
+    int full_price;
+
+    public Fiskalna(String line) throws AmountNotAllowedException {
+        String [] delovi = line.split("\\s+");
+        List<Items> pom = new ArrayList<>();
+        for (int i = 1; i < (delovi.length); i+=2) {
+            Items nov = new Items(Integer.parseInt(delovi[i]), delovi[i+1]);
+            pom.add(nov);
+        }
+
+        //samo ako mozhe togaj dodadi
+        if(allowed_amount(pom)){
+            id = delovi[0];
+            itemsList = pom;
+        }
+    }
+
+    boolean allowed_amount(List<Items> it) throws AmountNotAllowedException {
+        int s = 0;
+        for (Items items : it) {
+            s+=items.item_price;
+        }
+        if(s > 30000)  throw new AmountNotAllowedException(s);
+        else full_price = s;
+        return true;
+    }
+
+    public int getFull_price() {
+        return full_price;
+    }
+
+    public double full_tax(){
+        double s = 0;
+        for (Items items : itemsList) {
+            if(items.item_tax_type != 0)s+=items.item_price* 0.15* items.item_tax_type;
+            else  s+=0;
+        }
+        return s;
+    }
+     
+     
+}
+
+class AmountNotAllowedException extends Exception{
+    public AmountNotAllowedException(int amount) {
+        System.out.println("Receipt with amount " + amount + " is not allowed to be scanned");
+    }
+}
+
+
+public class MojDDVTest {
+
+    public static void main(String[] args) throws AmountNotAllowedException {
+
+        MojDDV mojDDV = new MojDDV();
+
+        System.out.println("===READING RECORDS FROM INPUT STREAM===");
+        mojDDV.readRecords(System.in);
+
+        System.out.println("===PRINTING TAX RETURNS RECORDS TO OUTPUT STREAM ===");
+        mojDDV.printTaxReturns(System.out);
+
+    }
+}
