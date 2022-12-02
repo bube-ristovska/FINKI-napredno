@@ -1,0 +1,166 @@
+//package KolokviumskaNP;
+
+import java.io.InputStream;
+import java.io.PrintStream;
+import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Scanner;
+import java.util.stream.Collectors;
+
+/**
+ * I partial exam 2016
+ */
+public class DailyTemperatureTest {
+    public static void main(String[] args) {
+        DailyTemperatures dailyTemperatures = new DailyTemperatures();
+        dailyTemperatures.readTemperatures(System.in);
+        System.out.println("=== Daily temperatures in Celsius (C) ===");
+        dailyTemperatures.writeDailyStats(System.out, 'C');
+        System.out.println("=== Daily temperatures in Fahrenheit (F) ===");
+        dailyTemperatures.writeDailyStats(System.out, 'F');
+    }
+}
+
+class DailyTemperatures {
+    List<Day> denovi;
+    public DailyTemperatures() {
+       denovi = new ArrayList<>();
+    }
+
+    public void readTemperatures(InputStream in) { //scanner
+        Scanner scanner = new Scanner(in);
+        while (scanner.hasNextLine()){
+            String line = scanner.nextLine();
+            Day den = new Day(line);
+            denovi.add(den);
+        }
+        scanner.close();
+    }
+
+    public void writeDailyStats(PrintStream out, char scale) { ///printwritter
+        PrintWriter printWriter = new PrintWriter(out);
+        List<Day> sortedDenovi = denovi.stream().sorted((d1, d2) -> d1.koj_den - d2.koj_den).collect(Collectors.toList());
+
+        if(scale == 'C'){
+            for (Day day : sortedDenovi) {
+                printWriter.println(String.format("%3d: Count: %3d Min: %6.2fC Max: %6.2fC Avg: %6.2fC", 
+                        day.koj_den, day.farenheit.size(), day.to_celsius(day.min), day.to_celsius(day.max), day.to_celsius(day.average)));
+            }
+        }
+        else{
+            for (Day day : sortedDenovi) {
+                printWriter.println(String.format("%3d: Count: %3d Min: %6.2fF Max: %6.2fF Avg: %6.2fF",
+                        day.koj_den, day.farenheit.size(), day.min, day.max, day.average));
+            }
+        }
+
+        printWriter.flush();
+
+    }
+
+}
+
+
+
+class Day {
+    int koj_den;
+    List<Double> farenheit;
+    List<Double> celsius;
+    //gi chuvash kako listovi od double
+
+    double min;
+    double max;
+    double average;
+    //site min max average se vo farenhiet
+    public Day(String den) {
+        celsius = new ArrayList<>();
+        farenheit = new ArrayList<>();
+        String [] delovi = den.split("\\s+");
+        koj_den = Integer.parseInt(delovi[0]);
+        int dadeno_vo = 0;
+        if((delovi[1].charAt((delovi[1].length())-1)) == 'C'){
+            dadeno_vo = 1; //celsius
+        }
+        else{
+            dadeno_vo = 2;//fareheit
+        }
+
+        if(dadeno_vo == 1){
+            for (int i = 1; i < delovi.length; i++) {
+                celsius.add(bez_bukva_na_kraj(delovi[i]));
+            }
+            for (Double aDouble : celsius) {
+                farenheit.add(to_farenhite(aDouble));
+            }
+        }
+        else{
+            for (int i = 1; i < delovi.length; i++) {
+                farenheit.add(bez_bukva_na_kraj(delovi[i]));
+            }
+            for (Double aDouble : farenheit) {
+                celsius.add(to_celsius(aDouble));
+            }
+        }
+
+        setMin();
+        setMax();
+        setAverage();
+    }
+
+    public double bez_bukva_na_kraj(String merenje){
+        int temp = 0;
+        int flag = 1;
+        char [] arr = merenje.toCharArray();
+        for (char c : arr) {
+            if(c == '-'){
+                flag = -1;
+            }
+            if(Character.isDigit(c)) temp=(temp*10)+Character.getNumericValue(c);
+        }
+        return (double)temp*flag;
+    }
+
+    public double to_farenhite(double num){
+        return ((num*9.0)/5.0)+32;
+    }
+    public double to_celsius(double num){
+        return ((num-32.0)*5)/9;
+    }
+
+    public void setMin() {
+        double min = farenheit.get(0);
+        for (Double aDouble : farenheit) {
+            if (aDouble < min) {
+                min = aDouble;
+            }
+        }
+        this.min = min;
+    }
+
+    public void setMax() {
+        double max = farenheit.get(0);
+        for (Double aDouble : farenheit) {
+            if (aDouble > max) {
+                max = aDouble;
+            }
+        }
+        this.max = max;
+    }
+
+    public void setAverage() {
+        double s = 0;
+        for (Double aDouble : farenheit) {
+            s+=aDouble;
+        }
+        this.average = s/farenheit.size();
+    }
+
+    public int getKoj_den() {
+        return koj_den;
+    }
+}
+
+
+
