@@ -1,0 +1,88 @@
+import java.util.ArrayList;
+import java.util.List;
+import java.io.InputStream;
+import java.io.PrintStream;
+import java.io.PrintWriter;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Scanner;
+
+public class Shapes1Test {
+
+    public static void main(String[] args) {
+        ShapesApplication shapesApplication = new ShapesApplication();
+
+        System.out.println("===READING SQUARES FROM INPUT STREAM===");
+        System.out.println(shapesApplication.readCanvases(System.in));
+        System.out.println("===PRINTING LARGEST CANVAS TO OUTPUT STREAM===");
+        shapesApplication.printLargestCanvasTo(System.out);
+
+    }
+}
+
+
+
+ class Canvas {
+    String id;
+    List<Integer> sides;
+
+    public Canvas(String str) {
+       String [] delovi =  str.split("\\s+");
+       id = delovi[0];
+       sides = new ArrayList<>();
+        for (int i = 1; i <delovi.length ; i++) {
+            sides.add(Integer.parseInt(delovi[i]));
+        }
+    }
+
+    int perimetar_of_canvas(){
+        int perimetar = 0;
+        for (Integer side : sides) {
+            perimetar+= side *4;
+        }
+        return perimetar;
+    }
+
+}
+
+
+ class ShapesApplication {
+    List<Canvas> canvasList;
+
+    public ShapesApplication() {
+        canvasList = new ArrayList<>();
+    }
+
+    public int readCanvases(InputStream in) {
+        Scanner scanner = new Scanner(in);
+        while (scanner.hasNextLine()){
+            String pom = scanner.nextLine();
+            Canvas c = new Canvas(pom);
+            canvasList.add(c);
+        }
+        scanner.close();
+
+        int cnt = 0;
+        for (Canvas canvas : canvasList) {
+            cnt+=canvas.sides.size();
+        }
+        return cnt;
+    }
+
+   public void printLargestCanvasTo(PrintStream out) {
+        PrintWriter printWriter = new PrintWriter(out);
+        int max = 0;
+        Canvas temp = canvasList.get(0);
+        for (Canvas canvas : canvasList) {
+            if(canvas.perimetar_of_canvas() >= max){
+                max = canvas.perimetar_of_canvas();
+                temp = canvas;
+            }
+        }
+        int kvadrati = temp.sides.size();
+
+        printWriter.print(temp.id +" " + kvadrati + " " + max);
+        printWriter.flush();
+    }
+}
+
