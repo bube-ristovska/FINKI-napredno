@@ -1,0 +1,96 @@
+
+import java.util.Scanner;
+public class TripleTest {
+	public static void main(String[] args) {
+		Scanner scanner = new Scanner(System.in);
+		int a = scanner.nextInt();
+		int b = scanner.nextInt();
+		int c = scanner.nextInt();
+		Triple<Integer> tInt = new Triple<Integer>(a, b, c);
+		System.out.printf("%.2f\n", tInt.max());
+		System.out.printf("%.2f\n", tInt.avarage());
+		tInt.sort();
+		System.out.println(tInt);
+		float fa = scanner.nextFloat();
+		float fb = scanner.nextFloat();
+		float fc = scanner.nextFloat();
+		Triple<Float> tFloat = new Triple<Float>(fa, fb, fc);
+		System.out.printf("%.2f\n", tFloat.max());
+		System.out.printf("%.2f\n", tFloat.avarage());
+		tFloat.sort();
+		System.out.println(tFloat);
+		double da = scanner.nextDouble();
+		double db = scanner.nextDouble();
+		double dc = scanner.nextDouble();
+		Triple<Double> tDouble = new Triple<Double>(da, db, dc);
+		System.out.printf("%.2f\n", tDouble.max());
+		System.out.printf("%.2f\n", tDouble.avarage());
+		tDouble.sort();
+		System.out.println(tDouble);
+	}
+}
+ class Triple<T extends Number> {
+    T a;
+    T b;
+    T c;
+
+    public Triple(T a, T b, T c) {
+        this.a = a;
+        this.b = b;
+        this.c = c;
+    }
+
+    public T getA() {
+        return a;
+    }
+
+    public T getB() {
+        return b;
+    }
+
+    public T getC() {
+        return c;
+    }
+
+    public double max() {
+        double aa, bb, cc;
+        aa = a.doubleValue();
+        bb = b.doubleValue();
+        cc = c.doubleValue();
+        double rez = Math.max(aa, Math.max(bb,cc));
+        if(rez == a.doubleValue()) return aa;
+        else if(rez == b.doubleValue())return bb;
+        else return cc;
+    }
+
+    public double avarage() {
+        double sum = a.doubleValue() + b.doubleValue()
+                + c.doubleValue();
+        return sum / 3;
+    }
+
+    public void sort() {
+        if (a.doubleValue() > b.doubleValue()) {
+            T temp = b;
+            b = a;
+            a = temp;
+        }
+        if (b.doubleValue() > c.doubleValue()) {
+            T temp = c;
+            c = b;
+            b = temp;
+        }
+        if (a.doubleValue() > b.doubleValue()) {
+            T temp = b;
+            b = a;
+            a = temp;
+        }
+
+    }
+
+    @Override
+    public String toString() {
+        return String.format("%.2f %.2f %.2f", a.doubleValue(), b.doubleValue(),c.doubleValue());
+    }
+}
+
