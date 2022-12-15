@@ -1,0 +1,88 @@
+package CodeFinki;
+import java.util.*;
+import java.util.stream.Collectors;
+
+class Name{
+    String ime;
+    int counter;
+    int unique_letters;
+
+    public Name(String ime, int counter) {
+        this.ime = ime;
+        this.counter = counter;
+        unique_letters = (int)ime.toLowerCase().chars().distinct().count();
+    }
+
+    public String getIme() {
+        return ime;
+    }
+}
+
+class Names{
+    List<Name> names;
+    List<String> vneseni_po_red;
+
+    public Names() {
+        names = new ArrayList<>();
+        vneseni_po_red = new ArrayList<>();
+    }
+    public void printN(int n){
+        Comparator<Name> komparator = Comparator.comparing(Name::getIme);
+        names.sort(komparator);
+        for (Name name : names) {
+           if(name.counter >= n) System.out.println(name.ime + " " + "(" + name.counter + ") "+ name.unique_letters);
+        }
+    }
+
+
+    public void addName(String line) {
+        vneseni_po_red.add(line);
+        boolean flag = false;
+        Name pom = null;
+        for (Name name1 : names) {
+            if(name1.ime.equals(line)){
+                flag = true;
+                pom = name1;
+            }
+
+        }
+        if(flag) pom.counter++;
+        else names.add(new Name(line, 1));
+    }
+
+    public String findName(int len, int index) {
+        Comparator<Name> komparator = Comparator.comparing(Name::getIme);
+        names.sort(komparator);
+        List<String> ne_izbrishani = new ArrayList<>();
+        for (Name s : names) {
+            if(s.ime.length() < len){
+                ne_izbrishani.add(s.ime);
+            }
+        }
+        //if(ne_izbrishani.size()-1 < index) return ne_izbrishani.get(index);
+
+        return ne_izbrishani.get(index%ne_izbrishani.size());
+    }
+}
+
+public class NamesTest {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        int n = scanner.nextInt();
+        scanner.nextLine();
+        Names names = new Names();
+        for (int i = 0; i < n; ++i) {
+            String name = scanner.nextLine();
+            names.addName(name);
+        }
+        n = scanner.nextInt();
+        System.out.printf("===== PRINT NAMES APPEARING AT LEAST %d TIMES =====\n", n);
+        names.printN(n);
+        System.out.println("===== FIND NAME =====");
+        int len = scanner.nextInt();
+        int index = scanner.nextInt();
+        System.out.println(names.findName(len, index));
+        scanner.close();
+
+    }
+}
