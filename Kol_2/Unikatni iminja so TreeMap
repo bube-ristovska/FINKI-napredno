@@ -1,0 +1,67 @@
+//package CodeFinki;
+
+import java.util.*;
+import java.util.stream.Collectors;
+
+class Names{
+    Map<String, Integer> iminja;
+
+
+    public Names() {
+        iminja = new TreeMap<>(); //avtomatski ni gi podreduva leksikografski
+    }
+
+    public void addName(String name) {
+        Integer count = iminja.get(name);
+        if(count == null){
+            count = 1;
+        }
+        else count++; //direktna referenca e
+        iminja.put(name, count);
+    }
+
+     public String findName(int len, int index) {
+        List<String> names = new ArrayList<>(iminja.keySet()); //napravi lista so samo key bez value fakticki samo so iminjata
+        List<String> izbrishani =  names.stream().filter(a->a.length()<len).collect(Collectors.toList());
+        if(izbrishani.size() < index) return izbrishani.get(index%izbrishani.size());
+        return izbrishani.get(index);
+    }
+
+    public void printN(int n) {
+        List<String> names = new ArrayList<>(iminja.keySet()); //napravi lista so samo key bez value fakticki samo so iminjata
+        for (int i = 0; i < iminja.size(); i++) {
+            String name = names.get(i);
+            int x = iminja.get(names.get(i));
+            if(x >= n){
+                System.out.print(name + " (");
+                System.out.print(iminja.get(names.get(i)) + ") ");
+                int unique = (int)name.toLowerCase().chars().distinct().count();
+                System.out.print(unique);
+                System.out.println();
+            }
+        }
+    }
+}
+
+public class NamesTest {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        int n = scanner.nextInt();
+        scanner.nextLine();
+        Names names = new Names();
+        for (int i = 0; i < n; ++i) {
+            String name = scanner.nextLine();
+            names.addName(name);
+        }
+        n = scanner.nextInt();
+        System.out.printf("===== PRINT NAMES APPEARING AT LEAST %d TIMES =====\n", n);
+        names.printN(n);
+        System.out.println("===== FIND NAME =====");
+        int len = scanner.nextInt();
+        int index = scanner.nextInt();
+        System.out.println(names.findName(len, index));
+        scanner.close();
+
+    }
+}
+
