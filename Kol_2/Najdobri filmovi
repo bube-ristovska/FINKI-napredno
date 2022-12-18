@@ -1,0 +1,103 @@
+//package CodeFinki;
+
+import java.util.*;
+import java.util.stream.Collectors;
+
+
+class Movie{
+    String title;
+    int [] ratings;
+    float avg;
+
+    public Movie(String title, int [] rat) {
+        this.title = title;
+        this.ratings = rat;
+        avg = (float)Arrays.stream(rat).average().getAsDouble();
+    }
+
+    public float getAvg() {
+        return avg;
+    }
+
+    @Override
+    public String toString() {
+        return String.format("%s (%.2f) of %d ratings", title, avg, ratings.length);
+    }
+}
+class MoviesList{
+    List<Movie> movies;
+
+    public MoviesList() {
+        this.movies = new ArrayList<>();
+    }
+
+    public void addMovie(String title, int[] ratings) {
+        Movie nov = new Movie(title, ratings);
+        movies.add(nov);
+    }
+
+    public List<Movie> top10ByAvgRating() {
+        Collections.sort(movies, (o1, o2) -> {
+            if(o1.avg == o2.avg){ //ako imaat isti average po ime gi sortirame
+                return (o1.title.compareTo(o2.title));
+            }
+            return Float.compare(o2.getAvg(), o1.getAvg());
+        });
+        if(movies.size() >= 10) return movies.subList(0,10); //ako imame povekje od 10 filma vo listata
+        else return movies;
+    }
+
+    public List<Movie> top10ByRatingCoef(){
+        Collections.sort(movies, ((o1, o2) -> {
+            int max = getMax();
+            Float prv = (o1.avg)*(o1.ratings.length)/max;
+            Float vtor = (o2.avg)*(o2.ratings.length)/max;
+            int cmpr =  Float.compare(vtor,prv);
+            if(cmpr == 0) return o1.title.compareTo(o2.title);
+            return cmpr;
+        }));
+        if(movies.size() >= 10) return movies.subList(0,10);
+        return movies;
+    }
+
+    public int getMax(){
+        int max = 0;
+        for (Movie movie : movies) {
+            max = Math.max(max, movie.ratings.length);
+        }
+        return max;
+    }
+
+
+}
+public class MoviesTest {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        MoviesList moviesList = new MoviesList();
+        int n = scanner.nextInt();
+        scanner.nextLine();
+        for (int i = 0; i < n; ++i) {
+            String title = scanner.nextLine();
+            int x = scanner.nextInt();
+            int[] ratings = new int[x];
+            for (int j = 0; j < x; ++j) {
+                ratings[j] = scanner.nextInt();
+            }
+            scanner.nextLine();
+            moviesList.addMovie(title, ratings);
+        }
+        scanner.close();
+        List<Movie> movies = moviesList.top10ByAvgRating();
+        System.out.println("=== TOP 10 BY AVERAGE RATING ===");
+        for (Movie movie : movies) {
+            System.out.println(movie);
+        }
+        movies = moviesList.top10ByRatingCoef();
+        System.out.println("=== TOP 10 BY RATING COEFFICIENT ===");
+        for (Movie movie : movies) {
+            System.out.println(movie);
+        }
+    }
+}
+
+// vashiot kod ovde
