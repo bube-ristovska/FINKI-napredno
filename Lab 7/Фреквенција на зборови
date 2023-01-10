@@ -1,0 +1,84 @@
+package CodeFinki;
+
+import java.io.FileNotFoundException;
+import java.io.InputStream;
+import java.util.*;
+import java.util.stream.Collectors;
+
+
+class TermFrequency{
+    HashMap<String, Integer> frequency_map;
+    int num_of_words;
+    List<String> tekst;
+
+    public TermFrequency(InputStream in, String[] stop) {
+        List<String> deklarirani = new ArrayList<>(Arrays.asList(stop));
+        Scanner scanner = new Scanner(in);
+        num_of_words = 0;
+        frequency_map = new HashMap<>();
+        //vnesi gi vo hesh zborovite shto treba da se deklarirani
+        //prochitaj od vlez
+        tekst= new ArrayList<>();
+        while (scanner.hasNextLine()){
+            String line = scanner.nextLine();
+            String[] deleno = line.split("\\s+");
+            for (String s : deleno) {
+                String normal = s.toLowerCase().replace(",", "").replace(".", "").trim();
+                tekst.add(normal);
+            }
+        }
+        scanner.close();
+
+
+        for (int i = 0; i < tekst.size(); i++) {
+            String zbor = tekst.get(i);
+            if(!deklarirani.contains(zbor)){
+                if(frequency_map.containsKey(zbor)){
+                    int f = frequency_map.get(zbor);
+                    frequency_map.put(zbor, f+1);
+                }
+                else frequency_map.put(zbor, 1);
+            }
+        }
+        num_of_words = frequency_map.size()-1;
+
+    }
+
+    public int countTotal() {
+        int total = 0;
+        for (Integer count : frequency_map.values()) {
+            total += count;
+        }
+        return total;
+    }
+
+    public int countDistinct(){
+        return frequency_map.size();
+    }
+
+    public List<String> mostOften(int k){
+        List<String> most_often = new ArrayList<>();
+        List<Map.Entry<String, Integer>> sortirani = frequency_map.entrySet().stream().sorted(Comparator.comparing(Map.Entry::getValue)).collect(Collectors.toList());
+        int m = 0;
+        for (int i = sortirani.size()-1; m <= k; i--) {
+             most_often.add(sortirani.get(i).getKey());
+             m++;
+        }
+        return most_often;
+    }
+
+}
+
+public class TermFrequencyTest {
+    public static void main(String[] args) throws FileNotFoundException {
+        String[] stop = new String[] { "во", "и", "се", "за", "ќе", "да", "од",
+                "ги", "е", "со", "не", "тоа", "кои", "до", "го", "или", "дека",
+                "што", "на", "а", "но", "кој", "ја" };
+        TermFrequency tf = new TermFrequency(System.in,
+                stop);
+        System.out.println(tf.countTotal());
+        System.out.println(tf.countDistinct());
+        System.out.println(tf.mostOften(10));
+    }
+}
+// vasiot kod ovde
