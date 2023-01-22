@@ -1,0 +1,82 @@
+package CodeFinki;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Scanner;
+import java.util.stream.Collectors;
+
+
+class Participant implements Comparable<Participant>{
+    String code;
+    String name;
+    String city;
+    int age;
+
+    public Participant(String code, String name, String city, int age) {
+        this.code = code;
+        this.name = name;
+        this.city = city;
+        this.age = age;
+    }
+
+
+    @Override
+    public int compareTo(Participant o) {
+        int po_ime = name.compareTo(o.name);
+        if(po_ime == 0) return Integer.compare(age,o.age);
+        return po_ime;
+    }
+
+    @Override
+    public String toString() {
+        return code + " " + name + " " + age;
+    }
+}
+class Audition{
+    HashMap<String, HashMap<String, Participant>> gradovi = new HashMap<>(); //grad -> (code --> participant)
+
+    void addParticpant(String city, String code, String name, int age){
+        if(gradovi.containsKey(city)){//postoi gradot
+            if(!gradovi.get(city).containsKey(code)){ //ako ne postoi so toj kod samo go stavame
+                Participant p = new Participant(code, name, city, age);
+                gradovi.get(city).put(code, p);
+            } //ako postoi so toj kod samo ignorirame tuka
+        }else{ //ne postoi gradot
+            Participant p = new Participant(code, name, city, age);
+            HashMap<String, Participant> mapa_na_participants = new HashMap<>(); //vo toj grad
+            mapa_na_participants.put(code, p);
+            gradovi.put(city, mapa_na_participants);
+        }
+    }
+
+    public void listByCity(String city) {
+        gradovi.get(city).values().stream()
+                .sorted().collect(Collectors.toList())
+                .forEach(System.out::println);
+
+    }
+}
+
+public class AuditionTest {
+    public static void main(String[] args) {
+        Audition audition = new Audition();
+        List<String> cities = new ArrayList<String>();
+        Scanner scanner = new Scanner(System.in);
+        while (scanner.hasNextLine()) {
+            String line = scanner.nextLine();
+            String[] parts = line.split(";");
+            if (parts.length > 1) {
+                audition.addParticpant(parts[0], parts[1], parts[2],
+                        Integer.parseInt(parts[3]));
+            } else {
+                cities.add(line);
+            }
+        }
+        for (String city : cities) {
+            System.out.printf("+++++ %s +++++\n", city);
+            audition.listByCity(city);
+        }
+        scanner.close();
+    }
+}
