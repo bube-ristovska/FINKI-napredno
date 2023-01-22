@@ -1,0 +1,117 @@
+//package CodeFinki;
+
+import java.util.*;
+import java.util.stream.IntStream;
+
+class SeatTakenException extends Exception{ }
+class SeatNotAllowedException extends Exception{}
+class Sector implements Comparable<Sector>{
+    int num; //kolku ima
+    String code; //ko ime na sektor
+    HashMap<Integer, Boolean> seatAvailability = new HashMap<>();
+    HashSet<Integer> previouslyBought = new HashSet<>(); //0neut 1-dom 2-gost
+    int bought;
+
+    public Sector(String code, int num) {
+        this.num = num;
+        this.code = code;
+        seatAvailability = new HashMap<>();
+        for (int i = 0; i < num; i++) {
+            seatAvailability.put(i, false);
+        }
+        //IntStream.of(0,num).forEach(a-> seatAvailability.put(a, false));
+        previouslyBought = new HashSet<>();
+        bought = 0;
+    }
+
+    @Override
+    public int compareTo(Sector o) {
+        int i = Integer.compare(num - bought, o.num - o.bought);
+        if(i == 0) return code.compareTo(o.code);
+        return -i;
+    }
+}
+class Stadium{
+        String nameOfStadium;
+        HashMap<String, Sector> sectorList;
+
+    public Stadium(String nameOfStadium) {
+        this.nameOfStadium = nameOfStadium;
+        sectorList = new HashMap<>();
+    }
+
+    void createSectors(String[] sectorNames, int[] sizes){
+        for (int i = 0; i < sectorNames.length; i++) {
+            Sector nov_sektor = new Sector(sectorNames[i], sizes[i]);
+            sectorList.put(sectorNames[i], nov_sektor);
+        }
+    }
+    void buyTicket(String sectorName, int seat, int type) throws SeatTakenException, SeatNotAllowedException {
+        if(!sectorList.get(sectorName).seatAvailability.containsKey(seat)){ //taken e
+           throw new SeatNotAllowedException();
+        }else{
+            if(sectorList.get(sectorName).seatAvailability.get(seat)) throw new SeatTakenException();
+            if(type == 1) {
+                if(sectorList.get(sectorName).previouslyBought.contains(2))
+                    throw new SeatNotAllowedException();
+            }
+            if(type == 2){
+                if(sectorList.get(sectorName).previouslyBought.contains(1))
+                    throw new SeatNotAllowedException();
+            }
+        }
+        if(sectorList.get(sectorName).seatAvailability.get(seat)) throw new SeatTakenException();
+        sectorList.get(sectorName).previouslyBought.add(type);
+        sectorList.get(sectorName).seatAvailability.put(seat, true);
+        int kupeni = sectorList.get(sectorName).bought;
+        sectorList.get(sectorName).bought = kupeni+1;
+    }
+
+    void showSectors(){
+        sectorList.values().stream()
+                .sorted()
+                .forEach(s-> {
+                    StringBuilder sb = new StringBuilder();
+                    sb.append(s.code); sb.append('\t');
+                    sb.append((s.num-s.bought)); sb.append("/");
+                    sb.append(s.num); sb.append('\t');
+                    //kupeni/svite*1000
+                    sb.append(String.format("%.1f",(s.bought/ (float)s.num)*100 )).append("%");
+                    System.out.println(sb);
+                });
+    }
+}
+
+public class StaduimTest {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        int n = scanner.nextInt();
+        scanner.nextLine();
+        String[] sectorNames = new String[n];
+        int[] sectorSizes = new int[n];
+        String name = scanner.nextLine();
+        for (int i = 0; i < n; ++i) {
+            String line = scanner.nextLine();
+            String[] parts = line.split(";");
+            sectorNames[i] = parts[0];
+            sectorSizes[i] = Integer.parseInt(parts[1]);
+        }
+        Stadium stadium = new Stadium(name);
+        stadium.createSectors(sectorNames, sectorSizes);
+        n = scanner.nextInt();
+        scanner.nextLine();
+        for (int i = 0; i < n; ++i) {
+            String line = scanner.nextLine();
+            String[] parts = line.split(";");
+            try {
+                stadium.buyTicket(parts[0], Integer.parseInt(parts[1]),
+                        Integer.parseInt(parts[2]));
+            } catch (SeatNotAllowedException e) {
+                System.out.println("SeatNotAllowedException");
+            } catch (SeatTakenException e) {
+                System.out.println("SeatTakenException");
+            }
+        }
+        stadium.showSectors();
+    }
+}
