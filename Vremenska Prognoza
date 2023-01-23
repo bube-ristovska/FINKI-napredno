@@ -1,0 +1,96 @@
+//package Weather;
+
+import java.util.HashSet;
+import java.util.Scanner;
+import java.util.Set;
+import java.util.TreeSet;
+
+interface Setter{
+    void setMeasurements(float temperature, float humidity, float pressure);
+}
+class ForecastDisplay implements Setter{
+    float previousPressure;
+
+    public ForecastDisplay(WeatherDispatcher weatherDispatcher) {
+        this.previousPressure = 0;
+        weatherDispatcher.register(this);
+    }
+    @Override
+    public void setMeasurements(float temperature, float humidity, float pressure) {
+        if(previousPressure > pressure){
+            System.out.println("Forecast: Cooler"); 
+        } else if(previousPressure < pressure){
+            System.out.println("Forecast: Improving");
+        } else{
+            System.out.println("Forecast: Same");
+        }
+        previousPressure = pressure;
+    }
+}
+class CurrentConditionsDisplay implements Setter{
+
+    public CurrentConditionsDisplay(WeatherDispatcher weatherDispatcher) {
+        weatherDispatcher.register(this);
+    }
+
+    @Override
+    public void setMeasurements(float temperature, float humidity, float pressure) {
+        System.out.println(String.format("Temperature: %.1fF\nHumidity: %.1f%%", temperature, humidity));
+    }
+}
+
+
+class WeatherDispatcher{
+    Set<Setter> setters; //objekti od interfejsot setter
+
+    public WeatherDispatcher() {
+        setters = new HashSet<>();
+    }
+
+    public void setMeasurements(float temperature, float humidity, float pressure) {
+        setters.forEach(s-> s.setMeasurements(temperature, humidity, pressure)); //so ova se upgrate za
+        System.out.println();
+    }
+    public void register(Setter upgrade) { //dokolku nekoj nov saka da prima informacii
+        setters.add(upgrade);
+    }
+    public void remove(Setter upgrade) {//dokolku nekoj go brisheme shto prima informacii
+        setters.remove(upgrade);
+    }
+
+
+}
+
+
+public class WeatherApplication {
+
+    public static void main(String[] args) {
+        WeatherDispatcher weatherDispatcher = new WeatherDispatcher();
+
+        CurrentConditionsDisplay currentConditions = new CurrentConditionsDisplay(weatherDispatcher);
+        ForecastDisplay forecastDisplay = new ForecastDisplay(weatherDispatcher);
+
+        Scanner scanner = new Scanner(System.in);
+        while (scanner.hasNext()) {
+            String line = scanner.nextLine();
+            String[] parts = line.split("\\s+");
+            weatherDispatcher.setMeasurements(Float.parseFloat(parts[0]), Float.parseFloat(parts[1]), Float.parseFloat(parts[2]));
+            if(parts.length > 3) {
+                int operation = Integer.parseInt(parts[3]);
+                if(operation==1) {
+                    weatherDispatcher.remove(forecastDisplay);
+                }
+                if(operation==2) {
+                    weatherDispatcher.remove(currentConditions);
+                }
+                if(operation==3) {
+                    weatherDispatcher.register(forecastDisplay);
+                }
+                if(operation==4) {
+                    weatherDispatcher.register(currentConditions);
+                }
+
+            }
+        }
+    }
+}
