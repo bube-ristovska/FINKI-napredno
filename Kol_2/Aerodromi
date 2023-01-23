@@ -1,0 +1,150 @@
+package CodeFinki;
+
+import java.util.*;
+import java.util.concurrent.atomic.AtomicInteger;
+
+class Flight implements Comparable<Flight>{
+    String from;
+    String to;
+    int time;
+    int duration;
+
+    public Flight(String from, String to, int time, int duration) {
+        this.from = from;
+        this.to = to;
+        this.time = time;
+        this.duration = duration;
+    }
+
+    @Override
+    public String toString() {
+        int end = time + duration;
+        int plus = end / (24 * 60);
+        end %= (24 * 60);
+        return String.format("%s-%s %02d:%02d-%02d:%02d%s %dh%02dm", from, to, time / 60, time % 60,
+                end / 60, end % 60, plus > 0 ? " +1d" : "", duration / 60, duration % 60);
+    }
+
+    @Override
+    public int compareTo(Flight o) {
+        int i = to.compareTo(o.to);
+        if(i ==0) return Integer.compare(time, o.time);
+        return i;
+    }
+}
+class Airport{
+    String name;
+    String country;
+    String code;
+    int passengers;
+    TreeMap<String, TreeSet<Flight>> flightsTo; //od aerodrom A mozhe da ima x flight do aer B
+
+    public Airport(String name, String country, String code, int passengers) {
+        this.name = name;
+        this.country = country;
+        this.code = code;
+        this.passengers = passengers;
+        flightsTo = new TreeMap<>();
+    }
+
+    @Override
+    public String toString() {
+        return String.format("%s (%s)\n%s\n%d", name, code, country, passengers);
+    }
+
+
+}
+class Airports{
+    TreeMap<String, Airport> airports; //code -> Airport //avtomatski se leksikografski
+    TreeSet<Flight> flights;
+
+    public Airports() {
+        airports = new TreeMap<>();
+        flights = new TreeSet<>();
+    }
+
+    public void addAirport(String name, String country, String code, int passengers) {
+        Airport air = new Airport(name, country, code, passengers);
+        airports.put(code, air);
+    }
+    public void addFlights(String from, String to, int time, int duration){
+        Flight let = new Flight(from, to, time, duration);
+        if(airports.get(from).flightsTo.containsKey(to)) airports.get(from).flightsTo.get(to).add(let);
+        else{
+            TreeSet<Flight>treeSet = new TreeSet<>();
+            treeSet.add(let);
+            airports.get(from).flightsTo.put(to, treeSet);
+        }
+        flights.add(let);
+
+    }
+    public void showFlightsFromAirport(String code) {
+        System.out.println(airports.get(code));
+        List<TreeSet<Flight>> list = new ArrayList<>();
+        airports.get(code).flightsTo.entrySet()
+                .stream()
+                .forEach(a-> list.add(a.getValue()));
+        AtomicInteger cnt = new AtomicInteger(1);
+        for (TreeSet<Flight> flights : list) {
+            flights.stream().forEach(f-> {
+                System.out.print(cnt.get()); cnt.getAndIncrement();
+                System.out.print(". ");
+                System.out.println(f);
+            });
+        }
+    }
+    public void showDirectFlightsFromTo(String from, String to){
+        if(!airports.get(from).flightsTo.containsKey(to)){
+            System.out.printf("No flights from %s to %s\n", from, to);
+        }
+        else{
+            airports.get(from).flightsTo.get(to)
+                    .forEach(System.out::println);
+        }
+    }
+    public void showDirectFlightsTo(String to){
+        for (Flight flight : flights) {
+            if(flight.to.equals(to))
+                System.out.println(flight);
+        }
+    }
+}
+
+public class AirportsTest {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        Airports airports = new Airports();
+        int n = scanner.nextInt();
+        scanner.nextLine();
+        String[] codes = new String[n];
+        for (int i = 0; i < n; ++i) {
+            String al = scanner.nextLine();
+            String[] parts = al.split(";");
+            airports.addAirport(parts[0], parts[1], parts[2], Integer.parseInt(parts[3]));
+            codes[i] = parts[2];
+        }
+        int nn = scanner.nextInt();
+        scanner.nextLine();
+        for (int i = 0; i < nn; ++i) {
+            String fl = scanner.nextLine();
+            String[] parts = fl.split(";");
+            airports.addFlights(parts[0], parts[1], Integer.parseInt(parts[2]), Integer.parseInt(parts[3]));
+        }
+        int f = scanner.nextInt();
+        int t = scanner.nextInt();
+        String from = codes[f];
+        String to = codes[t];
+        System.out.printf("===== FLIGHTS FROM %S =====\n", from);
+        airports.showFlightsFromAirport(from);
+        System.out.printf("===== DIRECT FLIGHTS FROM %S TO %S =====\n", from, to);
+        airports.showDirectFlightsFromTo(from, to);
+        t += 5;
+        t = t % n;
+        to = codes[t];
+        System.out.printf("===== DIRECT FLIGHTS TO %S =====\n", to);
+        airports.showDirectFlightsTo(to);
+    }
+}
+
+// vashiot kod ovde
+
